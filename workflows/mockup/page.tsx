@@ -42,19 +42,19 @@ export default function MockupWorkflowPage() {
     setError(null);
 
     try {
-      const response = await fetch("/api/interactive/mockup/text-lab/analyze", {
+      const response = await fetch("/workflows/mockup/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
 
-      if (!response.ok) throw new Error("Plugin API returned an error.");
+      if (!response.ok) throw new Error("Workflow API returned an error.");
 
       const data = await response.json();
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError("Could not reach the mockup plugin API. Check whether the backend reloaded after installation.");
+      setError("Could not reach the mockup workflow API. Check whether the frontend reloaded after installation.");
     } finally {
       setIsLoading(false);
     }
@@ -70,11 +70,11 @@ export default function MockupWorkflowPage() {
             </div>
             <h1 className="text-3xl font-black tracking-tight text-slate-950">Text Lab Mockup</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              A small template shipped by the plugin. It talks to a plugin API endpoint and renders the response in a dashboard-style view.
+              A small template shipped by the plugin. It talks to a co-installed workflow API endpoint and renders the response in a dashboard-style view.
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-mono text-slate-500">
-            /api/interactive/mockup/text-lab/analyze
+            /workflows/mockup/api/analyze
           </div>
         </header>
 
@@ -110,7 +110,7 @@ export default function MockupWorkflowPage() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : <BarChart3 size={18} />}
-                Analyze with Plugin API
+                Analyze with Workflow API
               </button>
             </div>
           </section>

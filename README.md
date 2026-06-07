@@ -20,6 +20,9 @@ ui/
   output/PluginSentimentBadge/Render.tsx
 workflows/
   mockup/
+    api/
+      analyze/
+        route.ts
     layout.tsx
     page.tsx
 requirements.txt
@@ -31,14 +34,15 @@ requirements.txt
 - `pluginstatscard`
 - `pluginsentimentbadge`
 
-## Plugin API
+## Workflow API
 
-After installation and backend reload, the API is available at:
+The installed workflow template includes its own Next.js route, so it does not depend on CGNodes backend dynamic API discovery:
 
 ```txt
-GET  /api/interactive/mockup/text-lab/health
-POST /api/interactive/mockup/text-lab/analyze
+POST /workflows/mockup/api/analyze
 ```
+
+The backend FastAPI implementation is still included in `api/text_lab.py` for hosts that register plugin APIs from the plugin `api/` directory.
 
 Example payload:
 
@@ -54,6 +58,6 @@ The plugin installs a frontend template at:
 /workflows/mockup
 ```
 
-It calls the plugin API and renders a small text analysis dashboard.
+It calls the co-installed workflow API and renders a small text analysis dashboard.
 
 Install it from CGNodes via **Settings → Package Manager** using this repository URL.
