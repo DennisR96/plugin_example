@@ -4,7 +4,7 @@ from schemas import Metadata, Handler
 from nodes import Node
 
 
-class Number(Node):
+class Number_2(Node):
     metadata = Metadata(
         icon="circle-plus",
         category="Calculator",
