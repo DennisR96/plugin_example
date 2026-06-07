@@ -16,8 +16,6 @@ ui/
   input/PluginTextInput/Render.tsx
   output/PluginStatsCard/Render.tsx
   output/PluginSentimentBadge/Render.tsx
-  inputs/...    # compatibility copy for package-manager variants
-  outputs/...   # compatibility copy for package-manager variants
 requirements.txt
 ```
 
