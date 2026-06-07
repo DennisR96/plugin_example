@@ -7,7 +7,7 @@ from schemas import Metadata, Handler
 
 class Adder(Node):
     metadata = Metadata(
-        name="Adder",
+        name="Adder_2",
         description="Adds two numbers together.",
         icon="sheet",
         category="file",
