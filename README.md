@@ -7,8 +7,6 @@ This package includes three backend nodes and a few custom frontend renderer moc
 ## Structure
 
 ```txt
-api/
-  text_lab.py
 nodes/
   text_lab/
     prompt_template.py
@@ -18,11 +16,10 @@ ui/
   input/PluginTextInput/Render.tsx
   output/PluginStatsCard/Render.tsx
   output/PluginSentimentBadge/Render.tsx
+api/
+  text_lab.py
 workflows/
   mockup/
-    api/
-      analyze/
-        route.ts
     layout.tsx
     page.tsx
 requirements.txt
@@ -34,15 +31,15 @@ requirements.txt
 - `pluginstatscard`
 - `pluginsentimentbadge`
 
-## Workflow API
+## Plugin API
 
-The installed workflow template includes its own Next.js route, so it does not depend on CGNodes backend dynamic API discovery:
+The installed package includes FastAPI endpoints from the top-level `api` folder:
 
 ```txt
-POST /workflows/mockup/api/analyze
+GET  /api/mockup/text-lab/health
+POST /api/mockup/text-lab/analyze
 ```
 
-The backend FastAPI implementation is still included in `api/text_lab.py` for hosts that register plugin APIs from the plugin `api/` directory.
 
 Example payload:
 
@@ -58,6 +55,6 @@ The plugin installs a frontend template at:
 /workflows/mockup
 ```
 
-It calls the co-installed workflow API and renders a small text analysis dashboard.
+It calls the co-installed plugin API and renders a small text analysis dashboard.
 
 Install it from CGNodes via **Settings → Package Manager** using this repository URL.
