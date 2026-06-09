@@ -4,7 +4,8 @@ import { useState, type CSSProperties } from "react";
 import { BarChart3, Loader2, Send, Sparkles, Trash2 } from "lucide-react";
 
 const EXAMPLE_TEXT = "CGNodes plugins are useful and make workflow extensions easy to test.";
-const API_ENDPOINT = "/interactive/mockup/text-lab/analyze";
+const API_ENDPOINT = "/api/interactive/mockup/text-lab/analyze";
+const DISPLAY_ENDPOINT = "/interactive/mockup/text-lab/analyze";
 
 type AnalysisResult = {
   characters: number;
@@ -207,7 +208,7 @@ export default function MockupWorkflowPage() {
               A small template shipped by the plugin. It talks to a co-installed API endpoint and renders the response in a dashboard-style view.
             </p>
           </div>
-          <div style={styles.endpoint}>{API_ENDPOINT}</div>
+          <div style={styles.endpoint}>{DISPLAY_ENDPOINT}</div>
         </header>
 
         <main style={styles.main}>

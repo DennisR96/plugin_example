@@ -38,6 +38,13 @@ The installed package includes FastAPI endpoints from the top-level `api` folder
 ```txt
 GET  /interactive/mockup/text-lab/health
 POST /interactive/mockup/text-lab/analyze
+
+From the installed frontend, call these through the app API proxy:
+
+```txt
+GET  /api/interactive/mockup/text-lab/health
+POST /api/interactive/mockup/text-lab/analyze
+```
 ```
 
 
