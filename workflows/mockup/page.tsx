@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { BarChart3, Loader2, Send, Sparkles, Trash2 } from "lucide-react";
 
 const EXAMPLE_TEXT = "CGNodes plugins are useful and make workflow extensions easy to test.";
+const API_ENDPOINT = "/interactive/mockup/text-lab/analyze";
 
 type AnalysisResult = {
   characters: number;
@@ -15,16 +16,149 @@ type AnalysisResult = {
 };
 
 const sentimentStyles = {
-  positive: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  negative: "border-rose-200 bg-rose-50 text-rose-800",
-  neutral: "border-slate-200 bg-slate-50 text-slate-800",
+  positive: { borderColor: "#a7f3d0", background: "#ecfdf5", color: "#065f46" },
+  negative: { borderColor: "#fecdd3", background: "#fff1f2", color: "#9f1239" },
+  neutral: { borderColor: "#e2e8f0", background: "#f8fafc", color: "#1e293b" },
+};
+
+const styles: Record<string, CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    padding: "32px",
+    fontFamily:
+      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    color: "#020617",
+    background: "linear-gradient(135deg, #f5f3ff 0%, #ffffff 48%, #f8fafc 100%)",
+  },
+  shell: { maxWidth: 1180, margin: "0 auto", display: "grid", gap: 24 },
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 24,
+    padding: 24,
+    border: "1px solid #ede9fe",
+    borderRadius: 28,
+    background: "rgba(255,255,255,0.86)",
+    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.08)",
+  },
+  eyebrow: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "4px 12px",
+    border: "1px solid #ddd6fe",
+    borderRadius: 999,
+    background: "#f5f3ff",
+    color: "#6d28d9",
+    fontSize: 12,
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.06em",
+  },
+  title: { margin: "14px 0 0", fontSize: 36, lineHeight: 1.1, fontWeight: 900, letterSpacing: -0.6 },
+  description: { margin: "10px 0 0", maxWidth: 720, color: "#64748b", fontSize: 14, lineHeight: 1.6 },
+  endpoint: {
+    alignSelf: "center",
+    padding: "12px 16px",
+    border: "1px solid #e2e8f0",
+    borderRadius: 16,
+    background: "#f8fafc",
+    color: "#64748b",
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace',
+    fontSize: 12,
+    whiteSpace: "nowrap",
+  },
+  main: { display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(340px, 0.9fr)", gap: 24 },
+  panel: {
+    overflow: "hidden",
+    border: "1px solid #e2e8f0",
+    borderRadius: 28,
+    background: "#ffffff",
+    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.08)",
+  },
+  panelHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "16px 20px",
+    borderBottom: "1px solid #f1f5f9",
+    background: "#f8fafc",
+  },
+  heading: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    margin: 0,
+    color: "#334155",
+    fontSize: 13,
+    fontWeight: 900,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+  },
+  clearButton: {
+    border: 0,
+    borderRadius: 10,
+    padding: 8,
+    color: "#94a3b8",
+    background: "transparent",
+    cursor: "pointer",
+  },
+  textarea: {
+    width: "100%",
+    minHeight: 384,
+    padding: 20,
+    border: 0,
+    resize: "none",
+    outline: "none",
+    color: "#1f2937",
+    fontSize: 14,
+    lineHeight: 1.7,
+    boxSizing: "border-box",
+    font: "inherit",
+  },
+  actionBar: { padding: 16, borderTop: "1px solid #f1f5f9" },
+  button: {
+    width: "100%",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: "12px 16px",
+    border: 0,
+    borderRadius: 14,
+    background: "#7c3aed",
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: 800,
+    cursor: "pointer",
+    boxShadow: "0 1px 2px rgba(15, 23, 42, 0.12)",
+  },
+  resultPanel: { padding: 20, border: "1px solid #e2e8f0", borderRadius: 28, background: "#ffffff" },
+  empty: {
+    minHeight: 384,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "1px dashed #e2e8f0",
+    borderRadius: 20,
+    background: "#f8fafc",
+    color: "#94a3b8",
+    fontSize: 14,
+  },
+  error: { padding: 16, border: "1px solid #fecdd3", borderRadius: 20, background: "#fff1f2", color: "#be123c" },
+  resultGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 },
+  statCard: { padding: 16, border: "1px solid #ede9fe", borderRadius: 20, background: "#fff" },
+  statLabel: { color: "#7c3aed", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em" },
+  statValue: { marginTop: 8, color: "#020617", fontSize: 32, fontWeight: 900, lineHeight: 1 },
+  sentiment: { marginTop: 16, padding: 20, border: "1px solid", borderRadius: 20 },
+  preview: { marginTop: 16, padding: 16, border: "1px solid #e2e8f0", borderRadius: 20, background: "#f8fafc" },
 };
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-violet-100 bg-white p-4 shadow-sm">
-      <div className="text-xs font-black uppercase tracking-wider text-violet-600">{label}</div>
-      <div className="mt-2 text-3xl font-black tracking-tight text-slate-950">{value}</div>
+    <div style={styles.statCard}>
+      <div style={styles.statLabel}>{label}</div>
+      <div style={styles.statValue}>{value}</div>
     </div>
   );
 }
@@ -42,7 +176,7 @@ export default function MockupWorkflowPage() {
     setError(null);
 
     try {
-      const response = await fetch("/api/mockup/text-lab/analyze", {
+      const response = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
@@ -61,27 +195,25 @@ export default function MockupWorkflowPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-slate-50 p-6 font-sans text-slate-950 md:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <header className="flex flex-col justify-between gap-4 rounded-3xl border border-violet-100 bg-white/80 p-6 shadow-sm backdrop-blur md:flex-row md:items-center">
+    <div style={styles.page}>
+      <div style={styles.shell}>
+        <header style={styles.header}>
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-violet-700">
+            <div style={styles.eyebrow}>
               <Sparkles size={14} /> Plugin Frontend Template
             </div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-950">Text Lab Mockup</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            <h1 style={styles.title}>Text Lab Mockup</h1>
+            <p style={styles.description}>
               A small template shipped by the plugin. It talks to a co-installed API endpoint and renders the response in a dashboard-style view.
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-mono text-slate-500">
-            /api/mockup/text-lab/analyze
-          </div>
+          <div style={styles.endpoint}>{API_ENDPOINT}</div>
         </header>
 
-        <main className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-5 py-4">
-              <h2 className="flex items-center gap-2 text-sm font-black uppercase tracking-wide text-slate-700">
+        <main style={styles.main}>
+          <section style={styles.panel}>
+            <div style={styles.panelHeader}>
+              <h2 style={styles.heading}>
                 <Send size={16} /> Input Text
               </h2>
               <button
@@ -89,7 +221,7 @@ export default function MockupWorkflowPage() {
                   setText("");
                   setResult(null);
                 }}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-white hover:text-rose-500"
+                style={styles.clearButton}
                 title="Clear"
               >
                 <Trash2 size={16} />
@@ -99,50 +231,46 @@ export default function MockupWorkflowPage() {
             <textarea
               value={text}
               onChange={(event) => setText(event.target.value)}
-              className="min-h-96 w-full resize-none p-5 text-sm leading-7 text-slate-800 outline-none placeholder:text-slate-400"
+              style={styles.textarea}
               placeholder="Type text to analyze..."
             />
 
-            <div className="border-t border-slate-100 p-4">
+            <div style={styles.actionBar}>
               <button
                 onClick={analyze}
                 disabled={isLoading || !text.trim()}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"
+                style={{ ...styles.button, opacity: isLoading || !text.trim() ? 0.55 : 1, cursor: isLoading || !text.trim() ? "not-allowed" : "pointer" }}
               >
-                {isLoading ? <Loader2 className="animate-spin" size={18} /> : <BarChart3 size={18} />}
+                {isLoading ? <Loader2 size={18} /> : <BarChart3 size={18} />}
                 Analyze with Plugin API
               </button>
             </div>
           </section>
 
-          <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="mb-4 text-sm font-black uppercase tracking-wide text-slate-700">Result</h2>
+          <section style={styles.resultPanel}>
+            <h2 style={{ ...styles.heading, marginBottom: 16 }}>Result</h2>
 
-            {error && <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">{error}</div>}
+            {error && <div style={styles.error}>{error}</div>}
 
-            {!error && !result && (
-              <div className="flex min-h-96 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm text-slate-400">
-                Run the analysis to see plugin API output.
-              </div>
-            )}
+            {!error && !result && <div style={styles.empty}>Run the analysis to see plugin API output.</div>}
 
             {result && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-3">
+              <div>
+                <div style={styles.resultGrid}>
                   <StatCard label="Chars" value={result.characters} />
                   <StatCard label="Words" value={result.words} />
                   <StatCard label="Lines" value={result.lines} />
                 </div>
 
-                <div className={`rounded-2xl border p-5 ${sentimentStyles[result.sentiment]}`}>
-                  <div className="text-xs font-black uppercase tracking-wider opacity-70">Sentiment</div>
-                  <div className="mt-2 text-4xl font-black capitalize tracking-tight">{result.sentiment}</div>
-                  <div className="mt-1 text-sm font-bold opacity-80">Score: {result.score}</div>
+                <div style={{ ...styles.sentiment, ...sentimentStyles[result.sentiment] }}>
+                  <div style={{ fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em", opacity: 0.72 }}>Sentiment</div>
+                  <div style={{ marginTop: 8, fontSize: 40, fontWeight: 900, lineHeight: 1, textTransform: "capitalize" }}>{result.sentiment}</div>
+                  <div style={{ marginTop: 6, fontSize: 14, fontWeight: 800, opacity: 0.82 }}>Score: {result.score}</div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="mb-2 text-xs font-black uppercase tracking-wider text-slate-500">Preview</div>
-                  <p className="text-sm leading-6 text-slate-700">{result.preview}</p>
+                <div style={styles.preview}>
+                  <div style={{ marginBottom: 8, color: "#64748b", fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.06em" }}>Preview</div>
+                  <p style={{ margin: 0, color: "#334155", fontSize: 14, lineHeight: 1.6 }}>{result.preview}</p>
                 </div>
               </div>
             )}

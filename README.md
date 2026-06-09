@@ -36,8 +36,8 @@ requirements.txt
 The installed package includes FastAPI endpoints from the top-level `api` folder:
 
 ```txt
-GET  /api/mockup/text-lab/health
-POST /api/mockup/text-lab/analyze
+GET  /interactive/mockup/text-lab/health
+POST /interactive/mockup/text-lab/analyze
 ```
 
 
